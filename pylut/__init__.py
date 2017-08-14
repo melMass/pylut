@@ -1,1 +1,1 @@
-from pylut import *
+from .pylut import *

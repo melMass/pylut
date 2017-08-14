@@ -10,6 +10,7 @@ Testing/
 *.pyc
 dist/
 doc/
+*.egg-info/
 MANIFEST
 
 # ============ #
