@@ -319,7 +319,7 @@ class LUT:
             greenIndex = ((currentCubeIndex % (cubeSize * cubeSize)) / (cubeSize))
             blueIndex = currentCubeIndex % cubeSize
 
-            latticePointColor = self.lattice[redIndex, greenIndex, blueIndex].Clamped01()
+            latticePointColor = self.lattice[int(redIndex), int(greenIndex), int(blueIndex)].Clamped01()
 
             string += latticePointColor.FormattedAsInteger(2 ** bitdepth - 1) + "\n"
 
@@ -506,11 +506,12 @@ class LUT:
         cubeSize = -1
 
         for line in lutFileLines:
-            if "Mesh" in line:
-                inputDepth = int(line.split()[1])
-                outputDepth = int(line.split()[2])
-                cubeSize = 2 ** inputDepth + 1
-                break
+            if "#" not in line:
+                if "Mesh" in line or len(line.split()) > 3:
+                    inputDepth = int(line.split()[1])
+                    outputDepth = int(line.split()[2])
+                    cubeSize = 2 ** inputDepth + 1
+                    break
             meshLineIndex += 1
 
         if cubeSize == -1:
