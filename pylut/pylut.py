@@ -18,7 +18,7 @@ def EmptyLatticeOfSize(cubeSize):
 def Indices01(cubeSize):
     indices = []
     ratio = 1.0 / float(cubeSize - 1)
-    for i in xrange(cubeSize):
+    for i in range(cubeSize):
         indices.append(float(i) * ratio)
     return indices
 
@@ -221,9 +221,9 @@ class LUT:
 
         newLattice = EmptyLatticeOfSize(newCubeSize)
         ratio = float(self.cubeSize - 1.0) / float(newCubeSize - 1.0)
-        for x in xrange(newCubeSize):
-            for y in xrange(newCubeSize):
-                for z in xrange(newCubeSize):
+        for x in range(newCubeSize):
+            for y in range(newCubeSize):
+                for z in range(newCubeSize):
                     newLattice[x, y, z] = self.ColorAtInterpolatedLatticePoint(x * ratio, y * ratio, z * ratio)
         return LUT(newLattice, name=self.name + "_Resized" + str(newCubeSize))
 
@@ -237,11 +237,11 @@ class LUT:
 
         bar = Bar("Building search tree", max=maxVal, suffix='%(percent)d%% - %(eta)ds remain')
         try:
-            for x in xrange(newCubeSize):
+            for x in range(newCubeSize):
                 if progress:
                     bar.next()
-                for y in xrange(newCubeSize):
-                    for z in xrange(newCubeSize):
+                for y in range(newCubeSize):
+                    for z in range(newCubeSize):
                         data.add(self.ColorAtInterpolatedLatticePoint(x * ratio, y * ratio, z * ratio).ToFloatArray(),
                                  (RemapIntTo01(x, maxVal), RemapIntTo01(y, maxVal), RemapIntTo01(z, maxVal)))
         except KeyboardInterrupt:
@@ -259,11 +259,11 @@ class LUT:
         maxVal = self.cubeSize - 1
         bar = Bar("Searching for matches", max=maxVal, suffix='%(percent)d%% - %(eta)ds remain')
         try:
-            for x in xrange(self.cubeSize):
+            for x in range(self.cubeSize):
                 if progress:
                     bar.next()
-                for y in xrange(self.cubeSize):
-                    for z in xrange(self.cubeSize):
+                for y in range(self.cubeSize):
+                    for z in range(self.cubeSize):
                         newLattice[x, y, z] = Color.FromFloatArray(tree.search_nn(
                             (RemapIntTo01(x, maxVal), RemapIntTo01(y, maxVal), RemapIntTo01(z, maxVal))).aux)
         except KeyboardInterrupt:
@@ -289,9 +289,9 @@ class LUT:
         cubeSize = self.cubeSize
         newLattice = EmptyLatticeOfSize(cubeSize)
 
-        for x in xrange(cubeSize):
-            for y in xrange(cubeSize):
-                for z in xrange(cubeSize):
+        for x in range(cubeSize):
+            for y in range(cubeSize):
+                for z in range(cubeSize):
                     selfColor = self.lattice[x, y, z].Clamped01()
                     newLattice[x, y, z] = otherLUT.ColorFromColor(selfColor)
         return LUT(newLattice, name=self.name + "+" + otherLUT.name)
@@ -302,9 +302,9 @@ class LUT:
         """
         cubeSize = self.cubeSize
         newLattice = EmptyLatticeOfSize(cubeSize)
-        for x in xrange(cubeSize):
-            for y in xrange(cubeSize):
-                for z in xrange(cubeSize):
+        for x in range(cubeSize):
+            for y in range(cubeSize):
+                for z in range(cubeSize):
                     newLattice[x, y, z] = self.ColorAtLatticePoint(x, y, z).ClampColor(min, max)
         return LUT(newLattice)
 
@@ -443,7 +443,7 @@ class LUT:
             raise NameError(
                 "Point Out of Bounds: (" + str(redPoint) + ", " + str(greenPoint) + ", " + str(bluePoint) + ")")
 
-        return self.lattice[redPoint, greenPoint, bluePoint]
+        return self.lattice[int(redPoint), int(greenPoint), int(bluePoint)]
 
     # float input from 0 to cubeSize-1
     def ColorAtInterpolatedLatticePoint(self, redPoint, greenPoint, bluePoint):
@@ -490,9 +490,9 @@ class LUT:
         """
         identityLattice = EmptyLatticeOfSize(cubeSize)
         indices01 = Indices01(cubeSize)
-        for r in xrange(cubeSize):
-            for g in xrange(cubeSize):
-                for b in xrange(cubeSize):
+        for r in range(cubeSize):
+            for g in range(cubeSize):
+                for b in range(cubeSize):
                     identityLattice[r, g, b] = Color(indices01[r], indices01[g], indices01[b])
         return LUT(identityLattice, name="Identity" + str(cubeSize))
 
@@ -619,168 +619,169 @@ class LUT:
         return LUT(lattice, name=os.path.splitext(os.path.basename(cubeFilePath))[0])
 
 
-@staticmethod
-def FromFSIDatFile(datFilePath):
-    datBytes = bytearray(open(datFilePath, 'r').read())
-    cubeSize = 64
-    lattice = EmptyLatticeOfSize(cubeSize)
-    lutBytes = datBytes[128:]
-    for currentCubeIndex in xrange(len(lutBytes) / 4):
-        rgb_packed = np.uint32(struct.unpack("<L", lutBytes[currentCubeIndex * 4:(currentCubeIndex * 4) + 4])[0])
+    @staticmethod
+    def FromFSIDatFile(datFilePath):
+        datBytes = bytearray(open(datFilePath, 'r').read())
+        cubeSize = 64
+        lattice = EmptyLatticeOfSize(cubeSize)
+        lutBytes = datBytes[128:]
+        for currentCubeIndex in range(len(lutBytes) / 4):
+            rgb_packed = np.uint32(struct.unpack("<L", lutBytes[currentCubeIndex * 4:(currentCubeIndex * 4) + 4])[0])
 
-        redValue = RemapIntTo01(rgb_packed & 1023, 1008)
-        greenValue = RemapIntTo01(rgb_packed >> 10 & 1023, 1008)
-        blueValue = RemapIntTo01(rgb_packed >> 20 & 1023, 1008)
+            redValue = RemapIntTo01(rgb_packed & 1023, 1008)
+            greenValue = RemapIntTo01(rgb_packed >> 10 & 1023, 1008)
+            blueValue = RemapIntTo01(rgb_packed >> 20 & 1023, 1008)
 
-        redIndex = currentCubeIndex % cubeSize
-        greenIndex = ((currentCubeIndex % (cubeSize * cubeSize)) / (cubeSize))
-        blueIndex = currentCubeIndex / (cubeSize * cubeSize)
+            redIndex = currentCubeIndex % cubeSize
+            greenIndex = ((currentCubeIndex % (cubeSize * cubeSize)) / (cubeSize))
+            blueIndex = currentCubeIndex / (cubeSize * cubeSize)
 
-        lattice[redIndex, greenIndex, blueIndex] = Color(redValue, greenValue, blueValue)
+            lattice[redIndex, greenIndex, blueIndex] = Color(redValue, greenValue, blueValue)
 
-    return LUT(lattice, name=os.path.splitext(os.path.basename(datFilePath))[0])
-
-
-def AddColorToEachPoint(self, color):
-    """
-    Add a Color value to every lattice point on the cube.
-    """
-    cubeSize = self.cubeSize
-    newLattice = EmptyLatticeOfSize(cubeSize)
-    for r in xrange(cubeSize):
-        for g in xrange(cubeSize):
-            for b in xrange(cubeSize):
-                newLattice[r, g, b] = self.lattice[r, g, b] + color
-    return LUT(newLattice)
+        return LUT(lattice, name=os.path.splitext(os.path.basename(datFilePath))[0])
 
 
-def SubtractColorFromEachPoint(self, color):
-    """
-    Subtract a Color value to every lattice point on the cube.
-    """
-    cubeSize = self.cubeSize
-    newLattice = EmptyLatticeOfSize(cubeSize)
-    for r in xrange(cubeSize):
-        for g in xrange(cubeSize):
-            for b in xrange(cubeSize):
-                newLattice[r, g, b] = self.lattice[r, g, b] - color
-    return LUT(newLattice)
+    def AddColorToEachPoint(self, color):
+        """
+        Add a Color value to every lattice point on the cube.
+        """
+        cubeSize = self.cubeSize
+        newLattice = EmptyLatticeOfSize(cubeSize)
+        for r in range(cubeSize):
+            for g in range(cubeSize):
+                for b in range(cubeSize):
+                    newLattice[r, g, b] = self.lattice[r, g, b] + color
+        return LUT(newLattice)
 
 
-def MultiplyEachPoint(self, color):
-    """
-    Multiply by a Color value or float for every lattice point on the cube.
-    """
-    cubeSize = self.cubeSize
-    newLattice = EmptyLatticeOfSize(cubeSize)
-    for r in xrange(cubeSize):
-        for g in xrange(cubeSize):
-            for b in xrange(cubeSize):
-                newLattice[r, g, b] = self.lattice[r, g, b] * color
-    return LUT(newLattice)
+    def SubtractColorFromEachPoint(self, color):
+        """
+        Subtract a Color value to every lattice point on the cube.
+        """
+        cubeSize = self.cubeSize
+        newLattice = EmptyLatticeOfSize(cubeSize)
+        for r in range(cubeSize):
+            for g in range(cubeSize):
+                for b in range(cubeSize):
+                    newLattice[r, g, b] = self.lattice[r, g, b] - color
+        return LUT(newLattice)
 
 
-def __add__(self, other):
-    if self.cubeSize is not other.cubeSize:
-        raise NameError("Lattice Sizes not equivalent")
-
-    return LUT(self.lattice + other.lattice)
-
-
-def __sub__(self, other):
-    if self.cubeSize is not other.cubeSize:
-        raise NameError("Lattice Sizes not equivalent")
-
-    return LUT(self.lattice - other.lattice)
-
-
-def __mul__(self, other):
-    className = other.__class__.__name__
-    if "Color" in className or "float" in className or "int" in className:
-        return self.MultiplyEachPoint(other)
-
-    if self.cubeSize is not other.cubeSize:
-        raise NameError("Lattice Sizes not equivalent")
-
-    return LUT(self.lattice * other.lattice)
+    def MultiplyEachPoint(self, color):
+        """
+        Multiply by a Color value or float for every lattice point on the cube.
+        """
+        cubeSize = self.cubeSize
+        newLattice = EmptyLatticeOfSize(cubeSize)
+        for r in range(cubeSize):
+            for g in range(cubeSize):
+                for b in range(cubeSize):
+                    newLattice[r, g, b] = self.lattice[r, g, b] * color
+        return LUT(newLattice)
 
 
-def __rmul__(self, other):
-    return self.__mul__(other)
+    def __add__(self, other):
+        if self.cubeSize is not other.cubeSize:
+            raise NameError("Lattice Sizes not equivalent")
+
+        return LUT(self.lattice + other.lattice)
 
 
-def __eq__(self, lut):
-    if isinstance(lut, LUT):
-        return (self.lattice == lut.lattice).all()
-    return NotImplemented
+    def __sub__(self, other):
+        if self.cubeSize is not other.cubeSize:
+            raise NameError("Lattice Sizes not equivalent")
+
+        return LUT(self.lattice - other.lattice)
 
 
-def __ne__(self, lut):
-    result = self.__eq__(lut)
-    if result is NotImplemented:
-        return result
-    return not result
+    def __mul__(self, other):
+        className = other.__class__.__name__
+        if "Color" in className or "float" in className or "int" in className:
+            return self.MultiplyEachPoint(other)
+
+        if self.cubeSize is not other.cubeSize:
+            raise NameError("Lattice Sizes not equivalent")
+
+        return LUT(self.lattice * other.lattice)
 
 
-def Plot(self):
-    """
-    Plot a LUT as a 3D RGB cube using matplotlib. Stolen from https://github.com/mikrosimage/ColorPipe-tools/tree/master/plotThatLut.
-    """
+    def __rmul__(self, other):
+        return self.__mul__(other)
 
-    try:
-        import matplotlib
-        # matplotlib : general plot
-        from matplotlib.pyplot import title, figure
-        # matplotlib : for 3D plot
-        # mplot3d has to be imported for 3d projection
-        import mpl_toolkits.mplot3d
-        from matplotlib.colors import rgb2hex
-    except ImportError:
-        print("matplotlib not installed. Run: pip install matplotlib")
-        return
 
-    # for performance reasons lattice size must be 9 or less
-    lut = None
-    if self.cubeSize > 9:
-        lut = self.Resize(9)
-    else:
-        lut = self
+    def __eq__(self, lut):
+        if isinstance(lut, LUT):
+            return (self.lattice == lut.lattice).all()
+        return NotImplemented
 
-    # init vars
-    cubeSize = lut.cubeSize
-    input_range = xrange(0, cubeSize)
-    max_value = cubeSize - 1.0
-    red_values = []
-    green_values = []
-    blue_values = []
-    colors = []
-    # process color values
-    for r in input_range:
-        for g in input_range:
-            for b in input_range:
-                # get a value between [0..1]
-                norm_r = r / max_value
-                norm_g = g / max_value
-                norm_b = b / max_value
-                # apply correction
-                res = lut.ColorFromColor(Color(norm_r, norm_g, norm_b))
-                # append values
-                red_values.append(res.r)
-                green_values.append(res.g)
-                blue_values.append(res.b)
-                # append corresponding color
-                colors.append(rgb2hex([norm_r, norm_g, norm_b]))
-    # init plot
-    fig = figure()
-    fig.canvas.set_window_title('pylut Plotter')
-    ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlabel('Red')
-    ax.set_ylabel('Green')
-    ax.set_zlabel('Blue')
-    ax.set_xlim(min(red_values), max(red_values))
-    ax.set_ylim(min(green_values), max(green_values))
-    ax.set_zlim(min(blue_values), max(blue_values))
-    title(self.name)
-    # plot 3D values
-    ax.scatter(red_values, green_values, blue_values, c=colors, marker="o")
-    matplotlib.pyplot.show()
+
+    def __ne__(self, lut):
+        result = self.__eq__(lut)
+        if result is NotImplemented:
+            return result
+        return not result
+
+
+    def Plot(self):
+        """
+        Plot a LUT as a 3D RGB cube using matplotlib.
+        Stolen from https://github.com/mikrosimage/ColorPipe-tools/tree/master/plotThatLut.
+        """
+
+        try:
+            import matplotlib
+            # matplotlib : general plot
+            from matplotlib.pyplot import title, figure
+            # matplotlib : for 3D plot
+            # mplot3d has to be imported for 3d projection
+            import mpl_toolkits.mplot3d
+            from matplotlib.colors import rgb2hex
+        except ImportError:
+            print("matplotlib not installed. Run: pip install matplotlib")
+            return
+
+        # for performance reasons lattice size must be 9 or less
+        lut = None
+        if self.cubeSize > 9:
+            lut = self.Resize(9)
+        else:
+            lut = self
+
+        # init vars
+        cubeSize = lut.cubeSize
+        input_range = range(0, cubeSize)
+        max_value = cubeSize - 1.0
+        red_values = []
+        green_values = []
+        blue_values = []
+        colors = []
+        # process color values
+        for r in input_range:
+            for g in input_range:
+                for b in input_range:
+                    # get a value between [0..1]
+                    norm_r = r / max_value
+                    norm_g = g / max_value
+                    norm_b = b / max_value
+                    # apply correction
+                    res = lut.ColorFromColor(Color(norm_r, norm_g, norm_b))
+                    # append values
+                    red_values.append(res.r)
+                    green_values.append(res.g)
+                    blue_values.append(res.b)
+                    # append corresponding color
+                    colors.append(rgb2hex([norm_r, norm_g, norm_b]))
+        # init plot
+        fig = figure()
+        fig.canvas.set_window_title('pylut Plotter')
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_xlabel('Red')
+        ax.set_ylabel('Green')
+        ax.set_zlabel('Blue')
+        ax.set_xlim(min(red_values), max(red_values))
+        ax.set_ylim(min(green_values), max(green_values))
+        ax.set_zlim(min(blue_values), max(blue_values))
+        title(self.name)
+        # plot 3D values
+        ax.scatter(red_values, green_values, blue_values, c=colors, marker="o")
+        matplotlib.pyplot.show()
