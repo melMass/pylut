@@ -365,7 +365,7 @@ class LUT:
             greenIndex = ((currentCubeIndex % (cubeSize * cubeSize)) / (cubeSize))
             blueIndex = currentCubeIndex / (cubeSize * cubeSize)
 
-            latticePointColor = self.lattice[redIndex, greenIndex, blueIndex].Clamped01()
+            latticePointColor = self.lattice[int(redIndex), int(greenIndex), int(blueIndex)].Clamped01()
 
             cubeFile.write(latticePointColor.FormattedAsFloat())
 
@@ -389,7 +389,7 @@ class LUT:
             greenIndex = ((currentCubeIndex % (cubeSize * cubeSize)) / (cubeSize))
             blueIndex = currentCubeIndex / (cubeSize * cubeSize)
 
-            latticePointColor = lut.lattice[redIndex, greenIndex, blueIndex].Clamped01()
+            latticePointColor = lut.lattice[int(redIndex), int(greenIndex), int(blueIndex)].Clamped01()
 
             rgb_packed = (
                 Remap01ToInt(latticePointColor.r, 1008) | Remap01ToInt(latticePointColor.g, 1008) << 10 | Remap01ToInt(
@@ -531,7 +531,7 @@ class LUT:
                 greenIndex = ((currentCubeIndex % (cubeSize * cubeSize)) / (cubeSize))
                 blueIndex = currentCubeIndex % cubeSize
 
-                lattice[redIndex, greenIndex, blueIndex] = Color.FromRGBInteger(redValue, greenValue, blueValue,
+                lattice[int(redIndex), int(greenIndex), int(blueIndex)] = Color.FromRGBInteger(redValue, greenValue, blueValue,
                                                                                 bitdepth=outputDepth)
                 currentCubeIndex += 1
 
@@ -573,7 +573,7 @@ class LUT:
                 greenIndex = ((currentCubeIndex % (cubeSize * cubeSize)) / (cubeSize))
                 blueIndex = currentCubeIndex % cubeSize
 
-                lattice[redIndex, greenIndex, blueIndex] = Color.FromRGBInteger(redValue, greenValue, blueValue,
+                lattice[int(redIndex), int(greenIndex), int(blueIndex)] = Color.FromRGBInteger(redValue, greenValue, blueValue,
                                                                                 bitdepth=outputDepth)
                 currentCubeIndex += 1
         return LUT(lattice, name=os.path.splitext(os.path.basename(lutFilePath))[0])
@@ -637,7 +637,7 @@ class LUT:
             greenIndex = ((currentCubeIndex % (cubeSize * cubeSize)) / (cubeSize))
             blueIndex = currentCubeIndex / (cubeSize * cubeSize)
 
-            lattice[redIndex, greenIndex, blueIndex] = Color(redValue, greenValue, blueValue)
+            lattice[int(redIndex), int(greenIndex), int(blueIndex)] = Color(redValue, greenValue, blueValue)
 
         return LUT(lattice, name=os.path.splitext(os.path.basename(datFilePath))[0])
 
